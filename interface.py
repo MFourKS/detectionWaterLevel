@@ -69,6 +69,15 @@ class CameraApp:
         self.log_scrollbar = tk.Scrollbar(window)
         self.log_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
 
+        # Create a dropdown list for selecting danger level
+        self.danger_label = tk.Label(self.input_frame, text="Select Danger Level:", bg=self.day_background_color,
+                                     fg=self.day_foreground_color)
+        self.danger_label.grid(row=2, column=0, padx=5, pady=5)
+        self.danger_values = {"Drought": -1, "Flood1": 1, "Flood2": 2, "Flood3": 3}
+        self.danger_dropdown = ttk.Combobox(self.input_frame, values=list(self.danger_values.keys()))
+        self.danger_dropdown.grid(row=2, column=1, padx=5, pady=5)
+        self.danger_dropdown.current(0)  # Set default value
+
         # Create a text widget to display the log messages
         self.log_label = tk.Label(window, text="Log:", bg=self.day_background_color, fg=self.day_foreground_color)
         self.log_label.pack(side=tk.BOTTOM)
@@ -80,7 +89,7 @@ class CameraApp:
         self.mode_button = tk.Button(window, text="Night Mode", command=self.toggle_mode)
         self.mode_button.pack(side=tk.BOTTOM, pady=5)
 
-        self.frame_broadcast = FrameBroadcast("river_video.mp4")
+        self.frame_broadcast = FrameBroadcast("river_video.mp4", "test-it8jo/1")
 
         self.video_stream()
 
@@ -94,6 +103,8 @@ class CameraApp:
         self.window.bind("<BackSpace>", self.remove_coordinate)
         self.canvas.bind("<Button-1>", self.set_y_coordinate)
 
+        self.log_file = open("log.txt", "a")
+
     def video_stream(self):
         # Retrieve a frame from the video stream
         ret, frame = self.frame_broadcast.get_frame()
@@ -104,8 +115,8 @@ class CameraApp:
             self.canvas.create_image(0, 0, image=photo, anchor=tk.NW)
             self.canvas.photo = photo
 
-            # Display coordinates on the video frame
-            for coord, color in self.coordinates:
+            for coord_data in self.coordinates:
+                coord, color, danger_level = coord_data
                 self.canvas.create_rectangle(0, coord - 1, 640, coord + 1, fill=color)
 
             # Update the canvas to reflect changes
@@ -123,14 +134,15 @@ class CameraApp:
         try:
             y = int(value)
             if 0 <= y <= 480:
-                existing_coords = [coord for coord, _ in self.coordinates]  # Extracting existing y-coordinates
+                existing_coords = [coord for coord, _, _ in self.coordinates]  # Extracting existing y-coordinates
                 if y in existing_coords:
                     self.log(f"Coordinate {y} already exists.")
                 else:
                     color = self.palette.get()
                     if color in self.available_colors:
-                        self.coordinates.append((y, color))
-                        self.log(f"Added new coordinate {y} with color {color}")
+                        danger_level = self.danger_values[self.danger_dropdown.get()]
+                        self.coordinates.append((y, color, danger_level))
+                        self.log(f"Added new coordinate {y} with color {color} and danger level {danger_level}")
                         self.update_listbox()
                         # Remove color from available options
                         self.available_colors.remove(color)
@@ -164,17 +176,28 @@ class CameraApp:
             self.save_coordinates_to_json()
         else:
             self.log("No coordinate selected.")
+
     def load_coordinates_from_json(self):
         try:
             with open("coordinates.json", "r") as file:
-                self.coordinates = json.load(file)
-                self.update_listbox()
+                data = file.read()
+                if data:
+                    self.coordinates = json.loads(data)
+                    self.update_listbox()
+                else:
+                    self.log("The coordinate file has been manually cleared.")
         except FileNotFoundError:
+            self.log("Coordinates JSON file not found.")
             self.coordinates = []
+        except json.JSONDecodeError as e:
+            self.log(f"Error decoding JSON: {e}")
 
     def save_coordinates_to_json(self):
-        with open("coordinates.json", "w") as file:
-            json.dump(self.coordinates, file)
+        try:
+            with open("coordinates.json", "w") as file:
+                json.dump(self.coordinates, file)
+        except Exception as e:
+            self.log(f"Error saving coordinates: {e}")
 
     def set_y_coordinate(self, event):
         y = event.y
@@ -192,16 +215,22 @@ class CameraApp:
 
     def update_listbox(self):
         self.listbox.delete(0, tk.END)
-        for coord, color in self.coordinates:
-            self.listbox.insert(tk.END, f"Y: {coord}, Color: {color}")
+        for coord_data in self.coordinates:
+            coord, color, danger_level = coord_data
+            self.listbox.insert(tk.END, f"Y: {coord}, Color: {color}, Danger Level: {danger_level}")
 
     def log(self, message):
         self.log_text.insert(tk.END, message + "\n")
         self.log_text.see(tk.END)
 
+        # Write log message to the log file
+        self.log_file.write(message + "\n")
+        self.log_file.flush()
+
     def on_closing(self):
         self.frame_broadcast.release()
         self.window.destroy()
+        self.log_file.close()
 
     def toggle_mode(self):
         if self.is_day_mode:

@@ -1,0 +1,58 @@
+Removed coordinate [339, 'purple']
+Added new coordinate 329 with color red
+Added new coordinate 364 with color yellow
+Color yellow is already used.
+Removed coordinate (364, 'yellow')
+Removed coordinate (329, 'red')
+Removed coordinate [112, 'red']
+Added new coordinate 85 with color red
+Color red is already used.
+Removed coordinate (85, 'red')
+Added new coordinate 152 with color red
+Invalid input. Please enter an integer.
+Invalid input. Please enter an integer.
+Added new coordinate 383 with color red
+Invalid input. Please enter an integer.
+Invalid input. Please enter an integer.
+Invalid input. Please enter an integer.
+Invalid input. Please enter an integer.
+Invalid input. Please enter an integer.
+Invalid input. Please enter an integer.
+Invalid input. Please enter an integer.
+Invalid input. Please enter an integer.
+Invalid input. Please enter an integer.
+Invalid input. Please enter an integer.
+Invalid input. Please enter an integer.
+Invalid input. Please enter an integer.
+Invalid input. Please enter an integer.
+Invalid input. Please enter an integer.
+Invalid input. Please enter an integer.
+Invalid input. Please enter an integer.
+Invalid input. Please enter an integer.
+Added new coordinate 316 with color red
+Invalid input. Please enter an integer.
+Invalid input. Please enter an integer.
+Added new coordinate 333 with color red and danger level -1
+Invalid input. Please enter an integer.
+Added new coordinate 107 with color red and danger level 2
+Invalid input. Please enter an integer.
+Added new coordinate 317 with color red and danger level -1
+Added new coordinate 124 with color red and danger level -1
+Added new coordinate 384 with color red and danger level -1
+Added new coordinate 208 with color red and danger level -1
+Added new coordinate 372 with color red and danger level -1
+Invalid input. Please enter an integer.
+Added new coordinate 120 with color red and danger level -1
+Color red is already used.
+Added new coordinate 360 with color purple and danger level 3
+Removed coordinate [360, 'purple', 3]
+Removed coordinate [120, 'red', -1]
+Added new coordinate 182 with color red and danger level -1
+Added new coordinate 429 with color orange and danger level -1
+Added new coordinate 119 with color red and danger level -1
+Removed coordinate [119, 'red', -1]
+Removed coordinate [429, 'orange', -1]
+Removed coordinate [182, 'red', -1]
+Added new coordinate 180 with color red and danger level -1
+Color red is already used.
+Added new coordinate 258 with color orange and danger level -1
