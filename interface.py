@@ -1,9 +1,12 @@
+import datetime
 import tkinter as tk
 from tkinter import ttk
 import cv2
 import PIL.Image, PIL.ImageTk
 import json
 from detection import FrameBroadcast
+
+
 class CameraApp:
     def __init__(self, window, window_title):
         self.window = window
@@ -73,7 +76,7 @@ class CameraApp:
         self.danger_label = tk.Label(self.input_frame, text="Select Danger Level:", bg=self.day_background_color,
                                      fg=self.day_foreground_color)
         self.danger_label.grid(row=2, column=0, padx=5, pady=5)
-        self.danger_values = {"Drought": -1, "Flood1": 1, "Flood2": 2, "Flood3": 3}
+        self.danger_values = {"Засуха": -1, "Паводок": 1, "Затопление": 2, "Наводнение": 3}
         self.danger_dropdown = ttk.Combobox(self.input_frame, values=list(self.danger_values.keys()))
         self.danger_dropdown.grid(row=2, column=1, padx=5, pady=5)
         self.danger_dropdown.current(0)  # Set default value
@@ -82,7 +85,7 @@ class CameraApp:
         self.log_label = tk.Label(window, text="Log:", bg=self.day_background_color, fg=self.day_foreground_color)
         self.log_label.pack(side=tk.BOTTOM)
 
-        self.log_text = tk.Text(window, height=4, width=80, yscrollcommand=self.log_scrollbar.set)
+        self.log_text = tk.Text(window, height=4, width=100, yscrollcommand=self.log_scrollbar.set)
         self.log_text.pack(side=tk.BOTTOM)
         self.log_scrollbar.config(command=self.log_text.yview)
 
@@ -220,11 +223,15 @@ class CameraApp:
             self.listbox.insert(tk.END, f"Y: {coord}, Color: {color}, Danger Level: {danger_level}")
 
     def log(self, message):
-        self.log_text.insert(tk.END, message + "\n")
+        timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        log_message = f"[{timestamp}] {message}"
+
+        # Display log message in the log_text widget
+        self.log_text.insert(tk.END, log_message + "\n")
         self.log_text.see(tk.END)
 
         # Write log message to the log file
-        self.log_file.write(message + "\n")
+        self.log_file.write(log_message + "\n")
         self.log_file.flush()
 
     def on_closing(self):

@@ -56,3 +56,39 @@ Removed coordinate [182, 'red', -1]
 Added new coordinate 180 with color red and danger level -1
 Color red is already used.
 Added new coordinate 258 with color orange and danger level -1
+Removed coordinate [258, 'orange', -1]
+Removed coordinate [180, 'red', -1]
+Added new coordinate 222 with color red and danger level -1
+Color red is already used.
+Added new coordinate 110 with color purple and danger level -1
+Added new coordinate 165 with color red and danger level 2
+Removed coordinate [222, 'red', -1]
+Added new coordinate 367 with color orange and danger level -1
+Removed coordinate [165, 'red', 2]
+Added new coordinate 178 with color red and danger level -1
+Color red is already used.
+Added new coordinate 138 with color purple and danger level -1
+Removed coordinate (138, 'purple', -1)
+No coordinate selected.
+Removed coordinate (178, 'red', -1)
+No coordinate selected.
+Removed coordinate [367, 'orange', -1]
+Removed coordinate [110, 'purple', -1]
+Added new coordinate 153 with color purple and danger level -1
+”ровень воды подн€лс€ выше purple линии, уровень опасности = -1
+”ровень воды подн€лс€ выше purple линии, уровень опасности = -1
+”ровень воды подн€лс€ выше purple линии, уровень опасности = -1
+”ровень воды подн€лс€ выше purple линии, уровень опасности = -1
+[2024-03-21 15:02:03] ”ровень воды подн€лс€ выше purple линии, уровень опасности = -1
+[2024-03-21 15:02:05] ”ровень воды подн€лс€ выше purple линии, уровень опасности = -1
+[2024-03-21 15:02:07] ”ровень воды подн€лс€ выше purple линии, уровень опасности = -1
+[2024-03-21 15:02:08] ”ровень воды подн€лс€ выше purple линии, уровень опасности = -1
+[2024-03-21 15:02:08] Removed coordinate [153, 'purple', -1]
+[2024-03-21 15:02:21] Added new coordinate 107 with color yellow and danger level 3
+[2024-03-21 15:02:26] ”ровень воды подн€лс€ выше purple линии, уровень опасности = -1
+[2024-03-21 15:02:28] ”ровень воды подн€лс€ выше purple линии, уровень опасности = -1
+[2024-03-21 15:02:29] ”ровень воды подн€лс€ выше purple линии, уровень опасности = -1
+[2024-03-21 15:02:40] ”ровень воды подн€лс€ выше purple линии, уровень опасности = -1
+[2024-03-21 15:02:47] ”ровень воды подн€лс€ выше purple линии, уровень опасности = -1
+[2024-03-21 15:03:46] ”ровень воды подн€лс€ выше yellow линии, уровень опасности = 3
+[2024-03-21 15:03:52] Added new coordinate 332 with color red and danger level -1
