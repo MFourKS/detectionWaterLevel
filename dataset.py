@@ -3,7 +3,7 @@ from PIL import Image
 import torch
 from torch.utils.data import Dataset
 from torchvision.transforms import functional as F
-# from roboflow import parse_annotation
+
 
 class CustomDataset(Dataset):
     def __init__(self, image_dir, label_dir, transform=None):

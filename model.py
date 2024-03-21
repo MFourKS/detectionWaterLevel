@@ -8,7 +8,7 @@ class YOLOv7(nn.Module):
         super(YOLOv7, self).__init__()
         self.num_classes = num_classes
 
-        # Define the architecture layers
+
         self.conv1 = nn.Conv2d(in_channels=3, out_channels=32, kernel_size=3, stride=1, padding=1)
         self.conv2 = nn.Conv2d(in_channels=32, out_channels=64, kernel_size=3, stride=2, padding=1)
         self.conv3 = nn.Conv2d(in_channels=64, out_channels=128, kernel_size=3, stride=2, padding=1)
@@ -18,7 +18,7 @@ class YOLOv7(nn.Module):
 
         self.fc1 = nn.Linear(1024 * 7 * 7, 4096)
         self.fc2 = nn.Linear(4096,
-                             num_classes * 6)  # Each box prediction contains class, x_center, y_center, width, height, angle
+                             num_classes * 6)
 
     def forward(self, x):
         x = self.conv1(x)
@@ -34,7 +34,7 @@ class YOLOv7(nn.Module):
         x = self.conv6(x)
         x = nn.functional.relu(x)
 
-        x = x.view(x.size(0), -1)  # Flatten the feature maps
+        x = x.view(x.size(0), -1)
 
         x = self.fc1(x)
         x = nn.functional.relu(x)
@@ -52,25 +52,24 @@ class YOLOLoss(nn.Module):
     def forward(self, outputs, targets):
         batch_size = outputs.size(0)
         grid_size = outputs.size(2)
-        stride = 640 // grid_size  # Assuming input image size is 640x640 and grid size matches output size
+        stride = 640 // grid_size
 
-        # Split predictions into class predictions, box predictions, and confidence scores
         class_predictions = outputs[:, :self.num_classes, :, :]
         box_predictions = outputs[:, self.num_classes:, :, :].view(batch_size, -1, grid_size, grid_size, 6)
 
-        # Split targets into class targets, box targets, and objectness scores
+
         class_targets = targets[:, :, 0].long().unsqueeze(2)
         box_targets = targets[:, :, 1:6].unsqueeze(3)
         objectness_targets = targets[:, :, 6].unsqueeze(2)
 
-        # Calculate loss for objectness score
+
         objectness_loss = nn.BCEWithLogitsLoss()(box_predictions[..., 0], objectness_targets)
 
-        # Calculate loss for class predictions
+
         class_loss = nn.CrossEntropyLoss()(class_predictions.view(-1, self.num_classes), class_targets.view(-1))
 
-        # Calculate loss for box predictions
-        # Convert box predictions to x, y, w, h, and angle format
+
+
         x_pred, y_pred, w_pred, h_pred, angle_pred = box_predictions[..., 1], box_predictions[..., 2], \
             box_predictions[..., 3], box_predictions[..., 4], \
             box_predictions[..., 5]
@@ -78,12 +77,12 @@ class YOLOLoss(nn.Module):
             box_targets[..., 2], box_targets[..., 3], \
             box_targets[..., 4]
 
-        # Calculate loss for box coordinates (x, y, w, h, angle)
+
         coord_loss = (torch.sqrt(torch.pow(x_pred - x_target, 2) + torch.pow(y_pred - y_target, 2)) +
                       torch.sqrt(torch.pow(w_pred - w_target, 2) + torch.pow(h_pred - h_target, 2)) +
                       torch.abs(angle_pred - angle_target)).mean()
 
-        # Calculate total loss
+
         total_loss = self.lambda_coord * coord_loss + class_loss + self.lambda_noobj * objectness_loss
 
         return total_loss
