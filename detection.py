@@ -1,12 +1,5 @@
-import datetime
+from lib import *
 
-import cv2
-from inference import get_model
-import supervision as sv
-import json
-import warnings
-from supervision import Position
-from tkinter import messagebox
 
 class VideoProcessor:
     def __init__(self, video_width, video_height, model_id):
@@ -61,7 +54,7 @@ class VideoProcessor:
                 self.display_warning(warning_message)
                 self.log(warning_message)
             if any(crossed_out):
-                print(f"Уровень воды опустился ниже {color_line} линии")
+                self.log(f"Уровень воды опустился ниже {color_line} линии")
         # for line_zone, _, _ in self.line_zones:
         #     line_zone_annotator = sv.LineZoneAnnotator(display_in_count=False, display_out_count=False)
         #     annotated_frame = line_zone_annotator.annotate(annotated_frame, line_zone)
