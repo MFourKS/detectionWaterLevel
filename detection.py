@@ -3,6 +3,7 @@ from lib import *
 
 class VideoProcessor:
     def __init__(self, video_width, video_height, model_id):
+        # self.callback_function = callback_function
         self.video_width = video_width
         self.video_height = video_height
         self.model = get_model(model_id)
@@ -17,6 +18,8 @@ class VideoProcessor:
         self.tracker = sv.ByteTrack()
         self.load_coordinates_from_json()
         self.line_zones = []
+        self.last_record_time = datetime.datetime.now()
+        self.highest_point_y = 0
         for item in self.coordinates:
             coord = int(item[0] * (video_height / 480))
             color_line = item[1]
@@ -46,11 +49,30 @@ class VideoProcessor:
         detections = self.tracker.update_with_detections(detections)
         annotated_frame = self.bounding_box_annotator.annotate(
             scene=frame, detections=detections)
+
+        current_time = datetime.datetime.now()
+        # if (current_time - self.last_record_time).total_seconds() >= 60:
+        #     # Record the highest point of the detection object on the Y scale
+        #     max_y = 0
+        #     for detection in detections:
+        #         if detection.box[1] > max_y:
+        #             max_y = detection.box[1]
+        #     self.highest_point_y = max_y
+        #     self.last_record_time = current_time
+        #     self.log(f"Highest point of detection object on Y scale: {self.highest_point_y}")
+
         for line_zone, severity_level, color_line in self.line_zones:
             crossed_in, crossed_out = line_zone.trigger(detections)
             if any(crossed_in):
                 warning_message = f"Уровень воды поднялся выше {color_line} линии, уровень опасности = {severity_level}"
                 warnings.warn(warning_message, Warning)
+
+                # warning_message = "1"
+                # if callable(self.callback_function):
+                #     self.callback_function(warning_message)
+                # else:
+                #     print("Warning: Callback function is not callable.")
+
                 self.display_warning(warning_message)
                 self.log(warning_message)
             if any(crossed_out):

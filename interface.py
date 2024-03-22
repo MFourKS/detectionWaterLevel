@@ -5,9 +5,9 @@ class CameraApp:
     def __init__(self, window, window_title):
         self.window = window
         self.window.title(window_title)
-
+        self.available_cameras = []
         # Open the default camera
-        self.cap = cv2.VideoCapture(0)
+        # self.cap = cv2.VideoCapture(0)
 
         # Color schemes
         self.day_background_color = "#E0E5EB"  # Light background for day mode
@@ -57,9 +57,15 @@ class CameraApp:
         self.listbox_scrollbar.grid(row=3, column=3, padx=5, pady=5, sticky=tk.NS)
 
         # Create a listbox to display objects
-        self.listbox = tk.Listbox(self.input_frame, height=10, width=40, yscrollcommand=self.listbox_scrollbar.set, bg="white")
+        self.listbox = tk.Listbox(self.input_frame, height=10, width=50, yscrollcommand=self.listbox_scrollbar.set, bg="white")
         self.listbox.grid(row=3, column=0, columnspan=2, padx=5, pady=5, sticky=tk.NS)
         self.listbox_scrollbar.config(command=self.listbox.yview)
+
+        self.camera_list_label = tk.Label(self.input_frame, text="Доступные камеры", bg=self.day_background_color, fg=self.day_foreground_color)
+        self.camera_list_label.grid(row=4, padx=5, columnspan=2, pady=5, sticky=tk.N)
+
+        self.camera_listbox = tk.Listbox(self.input_frame, width=30)
+        self.camera_listbox.grid(row=5, padx=5, columnspan=2, pady=5, sticky=tk.NS)
 
         # Create a scrollbar for the log text
         self.log_scrollbar = tk.Scrollbar(window)
@@ -74,6 +80,15 @@ class CameraApp:
         self.danger_dropdown.grid(row=2, column=1, padx=5, pady=5)
         self.danger_dropdown.current(0)  # Set default value
 
+        # self.camera_list_button = tk.Button(self.main_frame, text="Поиск доступных камер", command=self.list_available_cameras)
+        # self.camera_list_button.grid(row=0, column=3, pady=5)
+
+        # Create a listbox to display available cameras
+        # self.camera_listbox = tk.Listbox(self.main_frame, height=10, width=50, bg="white")
+        # self.camera_listbox.grid(row=1, column=3, padx=5, pady=5)
+
+        self.update_camera_list_timer()
+
         # Create a text widget to display the log messages
         self.log_label = tk.Label(window, text="Журнал событий", bg=self.day_background_color, fg=self.day_foreground_color)
         self.log_label.pack(side=tk.BOTTOM)
@@ -85,7 +100,12 @@ class CameraApp:
         self.mode_button = tk.Button(window, text="Ночной режим", command=self.toggle_mode)
         self.mode_button.pack(side=tk.BOTTOM, pady=5)
 
+        self.restart_button = Button(window, text="Обновить данные", command=self.restart_frame_broadcast)
+        self.restart_button.pack(side=tk.BOTTOM, pady=5)
+
         self.frame_broadcast = FrameBroadcast("river_video.mp4", "test-it8jo/1")
+
+        # self.video_processor = VideoProcessor(640, 480, "test-it8jo/1", self.display_warning_message)
 
         self.video_stream()
 
@@ -226,6 +246,45 @@ class CameraApp:
         # Write log message to the log file
         self.log_file.write(log_message + "\n")
         self.log_file.flush()
+
+    def update_camera_list_timer(self):
+        # Call the method to update the list of available cameras
+        self.list_available_cameras()
+        # Schedule the next update after 10 seconds
+        self.window.after(10000, self.update_camera_list_timer)
+
+    def list_available_cameras(self):
+        # Start a new thread to find and display available cameras
+        threading.Thread(target=self.find_and_display_cameras).start()
+
+    def find_and_display_cameras(self):
+        available_cameras = []
+        for i in range(10):
+            cap = cv2.VideoCapture(i)
+            if cap.isOpened():
+                available_cameras.append(f"Camera {i}")
+                cap.release()
+        self.available_cameras = available_cameras
+        # Update the listbox in the main thread
+        self.camera_listbox.delete(0, tk.END)
+        self.window.after(0, self.update_cam_listbox)
+
+    def update_cam_listbox(self):
+        for camera in self.available_cameras:
+            self.camera_listbox.insert(tk.END, camera)
+
+    def restart_frame_broadcast(self):
+        # Release the current frame broadcast
+        self.frame_broadcast.release()
+        # Restart frame broadcast
+        self.frame_broadcast = FrameBroadcast("river_video.mp4", "test-it8jo/1")
+        # Restart video stream
+        self.video_stream()
+    # def display_warning_message(message, log_text):
+    #     timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    #     log_message = f"[{timestamp}] {message}"
+    #     log_text.insert(tk.END, log_message + "\n")
+    #     log_text.see(tk.END)
 
     def on_closing(self):
         self.frame_broadcast.release()
